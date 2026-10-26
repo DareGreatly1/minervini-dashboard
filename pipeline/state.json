@@ -4,29 +4,29 @@
    "entry": 153.96,
    "stop": 141.64,
    "since": "2026-10-20",
-   "last": 163.03,
-   "gain_pct": 5.9
+   "last": 163.68,
+   "gain_pct": 6.3
   },
   "TRV": {
    "entry": 385.37,
    "stop": 354.54,
    "since": "2026-10-20",
-   "last": 398.28,
-   "gain_pct": 3.4
+   "last": 400.17,
+   "gain_pct": 3.8
   },
   "STLD": {
    "entry": 243.58,
    "stop": 224.09,
    "since": "2026-10-20",
-   "last": 241.53,
-   "gain_pct": -0.8
+   "last": 237.55,
+   "gain_pct": -2.5
   },
   "CSX": {
    "entry": 49.22,
    "stop": 45.28,
    "since": "2026-10-22",
-   "last": 50.79,
-   "gain_pct": 3.2
+   "last": 51.31,
+   "gain_pct": 4.2
   }
  },
  "history": [
@@ -83,12 +83,14 @@
   "EOG": "HOLD",
   "TRV": "HOLD",
   "STLD": "HOLD",
-  "TXN": "SELL",
   "CSX": "HOLD",
-  "PLTR": "WATCH",
-  "CNC": "WATCH",
-  "AIZ": "WATCH",
-  "CAH": "WATCH",
+  "P": "WATCH",
+  "VEEV": "WATCH",
+  "ZBRA": "WATCH",
+  "TWLO": "WATCH",
+  "NUE": "WATCH",
+  "SJM": "WATCH",
+  "ROST": "WATCH",
   "AAPL": "WATCH"
  },
  "runs": [
@@ -293,6 +295,24 @@
     "CNC": "WATCH",
     "AIZ": "WATCH",
     "CAH": "WATCH",
+    "AAPL": "WATCH"
+   }
+  },
+  {
+   "run": "2026-10-26T13:35",
+   "asof": "2026-10-26",
+   "signals": {
+    "EOG": "HOLD",
+    "TRV": "HOLD",
+    "STLD": "HOLD",
+    "CSX": "HOLD",
+    "P": "WATCH",
+    "VEEV": "WATCH",
+    "ZBRA": "WATCH",
+    "TWLO": "WATCH",
+    "NUE": "WATCH",
+    "SJM": "WATCH",
+    "ROST": "WATCH",
     "AAPL": "WATCH"
    }
   }
