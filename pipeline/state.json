@@ -1,0 +1,300 @@
+{
+ "positions": {
+  "EOG": {
+   "entry": 153.96,
+   "stop": 141.64,
+   "since": "2026-10-20",
+   "last": 163.03,
+   "gain_pct": 5.9
+  },
+  "TRV": {
+   "entry": 385.37,
+   "stop": 354.54,
+   "since": "2026-10-20",
+   "last": 398.28,
+   "gain_pct": 3.4
+  },
+  "STLD": {
+   "entry": 243.58,
+   "stop": 224.09,
+   "since": "2026-10-20",
+   "last": 241.53,
+   "gain_pct": -0.8
+  },
+  "CSX": {
+   "entry": 49.22,
+   "stop": 45.28,
+   "since": "2026-10-22",
+   "last": 50.79,
+   "gain_pct": 3.2
+  }
+ },
+ "history": [
+  {
+   "date": "2026-10-20",
+   "ticker": "EOG",
+   "signal": "BUY",
+   "price": 157.09,
+   "entry": 153.96,
+   "reason": "breakout +2.0% past pivot 153.96 on 1.77x vol; stop 141.64"
+  },
+  {
+   "date": "2026-10-20",
+   "ticker": "TRV",
+   "signal": "BUY",
+   "price": 393.37,
+   "entry": 385.37,
+   "reason": "breakout +2.1% past pivot 385.37 on 2.28x vol; stop 354.54"
+  },
+  {
+   "date": "2026-10-20",
+   "ticker": "STLD",
+   "signal": "BUY",
+   "price": 244.37,
+   "entry": 243.58,
+   "reason": "breakout +0.3% past pivot 243.58 on 1.47x vol; stop 224.09"
+  },
+  {
+   "date": "2026-10-21",
+   "ticker": "TXN",
+   "signal": "BUY",
+   "price": 284.65,
+   "entry": 284.47,
+   "reason": "breakout +0.1% past pivot 284.47 on 1.75x vol; stop 261.71"
+  },
+  {
+   "date": "2026-10-22",
+   "ticker": "CSX",
+   "signal": "BUY",
+   "price": 51.67,
+   "entry": 49.22,
+   "reason": "breakout +5.0% past pivot 49.22 on 1.99x vol; stop 45.28"
+  },
+  {
+   "date": "2026-10-23",
+   "ticker": "TXN",
+   "signal": "SELL",
+   "price": 284.69,
+   "entry": 284.47,
+   "reason": "failed Trend Template"
+  }
+ ],
+ "last_signals": {
+  "EOG": "HOLD",
+  "TRV": "HOLD",
+  "STLD": "HOLD",
+  "TXN": "SELL",
+  "CSX": "HOLD",
+  "PLTR": "WATCH",
+  "CNC": "WATCH",
+  "AIZ": "WATCH",
+  "CAH": "WATCH",
+  "AAPL": "WATCH"
+ },
+ "runs": [
+  {
+   "run": "2026-10-20T10:50",
+   "asof": "2026-10-20",
+   "signals": {
+    "XOM": "WATCH",
+    "DVN": "WATCH",
+    "STLD": "WATCH",
+    "PSX": "WATCH",
+    "CNC": "WATCH",
+    "EOG": "BUY",
+    "TRV": "BUY",
+    "ADI": "WATCH",
+    "ROST": "WATCH",
+    "AMGN": "WATCH",
+    "GRMN": "WATCH",
+    "TXN": "WATCH",
+    "NDSN": "WATCH",
+    "BBY": "WATCH",
+    "AAPL": "WATCH"
+   }
+  },
+  {
+   "run": "2026-10-20T13:40",
+   "asof": "2026-10-20",
+   "signals": {
+    "EOG": "HOLD",
+    "TRV": "HOLD",
+    "XOM": "WATCH",
+    "DVN": "WATCH",
+    "STLD": "BUY",
+    "PSX": "WATCH",
+    "CNC": "WATCH",
+    "AMGN": "WATCH",
+    "ROST": "WATCH",
+    "ADI": "WATCH",
+    "GRMN": "WATCH",
+    "NDSN": "WATCH",
+    "BBY": "WATCH",
+    "TXN": "WATCH",
+    "AAPL": "WATCH"
+   }
+  },
+  {
+   "run": "2026-10-21T13:39",
+   "asof": "2026-10-21",
+   "signals": {
+    "EOG": "HOLD",
+    "TRV": "HOLD",
+    "STLD": "HOLD",
+    "XOM": "WATCH",
+    "DVN": "WATCH",
+    "PSX": "WATCH",
+    "MPC": "WATCH",
+    "VLO": "WATCH",
+    "COP": "WATCH",
+    "ADI": "WATCH",
+    "TXN": "BUY",
+    "ABNB": "WATCH",
+    "LLY": "WATCH",
+    "CNC": "WATCH",
+    "SJM": "WATCH",
+    "AMGN": "WATCH",
+    "AIZ": "WATCH",
+    "NDSN": "WATCH",
+    "ROST": "WATCH",
+    "BBY": "WATCH",
+    "AAPL": "WATCH"
+   }
+  },
+  {
+   "run": "2026-10-22T10:22",
+   "asof": "2026-10-22",
+   "signals": {
+    "EOG": "HOLD",
+    "TRV": "HOLD",
+    "STLD": "HOLD",
+    "TXN": "HOLD",
+    "XOM": "WATCH",
+    "DVN": "WATCH",
+    "DDOG": "WATCH",
+    "CVX": "WATCH",
+    "COP": "WATCH",
+    "ZBRA": "WATCH",
+    "ABNB": "WATCH",
+    "NUE": "WATCH",
+    "TWLO": "WATCH",
+    "APA": "WATCH",
+    "TRGP": "WATCH",
+    "ROST": "WATCH",
+    "ADI": "WATCH",
+    "FANG": "WATCH",
+    "AAPL": "WATCH"
+   }
+  },
+  {
+   "run": "2026-10-22T12:24",
+   "asof": "2026-10-22",
+   "signals": {
+    "EOG": "HOLD",
+    "TRV": "HOLD",
+    "STLD": "HOLD",
+    "TXN": "HOLD",
+    "XOM": "WATCH",
+    "PLTR": "WATCH",
+    "DVN": "WATCH",
+    "DDOG": "WATCH",
+    "COP": "WATCH",
+    "APA": "WATCH",
+    "CAH": "WATCH",
+    "ABNB": "WATCH",
+    "NUE": "WATCH",
+    "TRGP": "WATCH",
+    "ROST": "WATCH",
+    "FANG": "WATCH",
+    "AAPL": "WATCH"
+   }
+  },
+  {
+   "run": "2026-10-22T12:25",
+   "asof": "2026-10-22",
+   "signals": {
+    "EOG": "HOLD",
+    "TRV": "HOLD",
+    "STLD": "HOLD",
+    "TXN": "HOLD",
+    "XOM": "WATCH",
+    "PLTR": "WATCH",
+    "DVN": "WATCH",
+    "DDOG": "WATCH",
+    "COP": "WATCH",
+    "APA": "WATCH",
+    "CAH": "WATCH",
+    "ABNB": "WATCH",
+    "NUE": "WATCH",
+    "TRGP": "WATCH",
+    "FANG": "WATCH",
+    "ROST": "WATCH",
+    "AAPL": "WATCH",
+    "CSX": "BUY"
+   }
+  },
+  {
+   "run": "2026-10-22T12:27",
+   "asof": "2026-10-22",
+   "signals": {
+    "EOG": "HOLD",
+    "TRV": "HOLD",
+    "STLD": "HOLD",
+    "TXN": "HOLD",
+    "CSX": "HOLD",
+    "XOM": "WATCH",
+    "PLTR": "WATCH",
+    "DVN": "WATCH",
+    "DDOG": "WATCH",
+    "COP": "WATCH",
+    "APA": "WATCH",
+    "NUE": "WATCH",
+    "CAH": "WATCH",
+    "ABNB": "WATCH",
+    "TRGP": "WATCH",
+    "FANG": "WATCH",
+    "ROST": "WATCH",
+    "AAPL": "WATCH"
+   }
+  },
+  {
+   "run": "2026-10-22T13:34",
+   "asof": "2026-10-22",
+   "signals": {
+    "EOG": "HOLD",
+    "TRV": "HOLD",
+    "STLD": "HOLD",
+    "TXN": "HOLD",
+    "CSX": "HOLD",
+    "XOM": "WATCH",
+    "PLTR": "WATCH",
+    "DVN": "WATCH",
+    "COP": "WATCH",
+    "DDOG": "WATCH",
+    "ABNB": "WATCH",
+    "NUE": "WATCH",
+    "FTNT": "WATCH",
+    "PSX": "WATCH",
+    "APA": "WATCH",
+    "TRGP": "WATCH",
+    "ROST": "WATCH"
+   }
+  },
+  {
+   "run": "2026-10-23T13:37",
+   "asof": "2026-10-23",
+   "signals": {
+    "EOG": "HOLD",
+    "TRV": "HOLD",
+    "STLD": "HOLD",
+    "TXN": "SELL",
+    "CSX": "HOLD",
+    "PLTR": "WATCH",
+    "CNC": "WATCH",
+    "AIZ": "WATCH",
+    "CAH": "WATCH",
+    "AAPL": "WATCH"
+   }
+  }
+ ]
+}
