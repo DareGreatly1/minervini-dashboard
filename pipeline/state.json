@@ -4,29 +4,36 @@
    "entry": 153.96,
    "stop": 141.64,
    "since": "2026-10-20",
-   "last": 161.1,
-   "gain_pct": 4.6
+   "last": 160.92,
+   "gain_pct": 4.5
   },
   "TRV": {
    "entry": 385.37,
    "stop": 354.54,
    "since": "2026-10-20",
-   "last": 397.03,
-   "gain_pct": 3.0
+   "last": 394.01,
+   "gain_pct": 2.2
   },
   "STLD": {
    "entry": 243.58,
    "stop": 224.09,
    "since": "2026-10-20",
-   "last": 246.8,
-   "gain_pct": 1.3
+   "last": 249.99,
+   "gain_pct": 2.6
   },
   "CSX": {
    "entry": 49.22,
    "stop": 45.28,
    "since": "2026-10-22",
-   "last": 52.27,
-   "gain_pct": 6.2
+   "last": 51.98,
+   "gain_pct": 5.6
+  },
+  "NUE": {
+   "entry": 264.62,
+   "stop": 243.45,
+   "since": "2026-10-28",
+   "last": 271.79,
+   "gain_pct": 2.7
   }
  },
  "history": [
@@ -77,6 +84,14 @@
    "price": 284.69,
    "entry": 284.47,
    "reason": "failed Trend Template"
+  },
+  {
+   "date": "2026-10-28",
+   "ticker": "NUE",
+   "signal": "BUY",
+   "price": 271.79,
+   "entry": 264.62,
+   "reason": "breakout +2.7% past pivot 264.62 on 1.83x vol; stop 243.45"
   }
  ],
  "last_signals": {
@@ -85,13 +100,15 @@
   "STLD": "HOLD",
   "CSX": "HOLD",
   "XOM": "WATCH",
-  "CVX": "WATCH",
+  "DVN": "WATCH",
   "ZBRA": "WATCH",
-  "AMGN": "WATCH",
+  "FANG": "WATCH",
+  "CVX": "WATCH",
+  "NUE": "BUY",
+  "PSX": "WATCH",
+  "COP": "WATCH",
   "BBY": "WATCH",
-  "LLY": "WATCH",
-  "AIZ": "WATCH",
-  "SJM": "WATCH"
+  "AIZ": "WATCH"
  },
  "runs": [
   {
@@ -332,6 +349,26 @@
     "LLY": "WATCH",
     "AIZ": "WATCH",
     "SJM": "WATCH"
+   }
+  },
+  {
+   "run": "2026-10-28T13:36",
+   "asof": "2026-10-28",
+   "signals": {
+    "EOG": "HOLD",
+    "TRV": "HOLD",
+    "STLD": "HOLD",
+    "CSX": "HOLD",
+    "XOM": "WATCH",
+    "DVN": "WATCH",
+    "ZBRA": "WATCH",
+    "FANG": "WATCH",
+    "CVX": "WATCH",
+    "NUE": "BUY",
+    "PSX": "WATCH",
+    "COP": "WATCH",
+    "BBY": "WATCH",
+    "AIZ": "WATCH"
    }
   }
  ]
