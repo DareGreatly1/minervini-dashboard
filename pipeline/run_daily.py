@@ -139,8 +139,41 @@ def card(t,kind):
     nm=html.escape(str(names.get(t,''))) if t in names else ''
     sc=f" · score {r.score}" if r is not None else ''
     return f'<div class="card {kind}"><b>{t}</b> {nm}{sc}<br><small>{html.escape(notes.get(t,""))}</small><br><b style="font-size:12px">{html.escape(sztxt(t,kind))}</b><br>{svg(t,pv,sp)}</div>'
+
+# ---- BUY (new): tracked positions whose BUY came on the last completed session before today (or today)
+def _newset():
+    today=(dt.datetime.utcnow()-dt.timedelta(hours=7)).date()
+    done=[d for d in px.index.date if d<today]
+    if not done: return set(),None
+    lc=str(max(done))
+    return {t for t,p in pos.items() if p.get('since','')>=lc and sig.get(t) in ('BUY','HOLD')},lc
+newset,lastcomp=_newset()
+def newcard(t):
+    p=pos[t]; c,_v=series(t); price=float(c.iloc[-1]); e=p['entry']; sd=p.get('since','')
+    h=[x for x in st['history'] if x['ticker']==t and x['signal']=='BUY' and x['date']==sd]
+    if h: sigpx=h[-1]['price']
+    else:
+        try: sigpx=float(c[c.index.date==dt.date.fromisoformat(sd)].iloc[-1])
+        except Exception: sigpx=None
+    past=(price/e-1)*100; chase=e*1.05; ext=past>5
+    txt=''
+    if AC:
+        ps=price*STOP_PCT; rd=eq*rp/100; n=int(rd//ps); n=max(min(n,int(cash//price),int(0.25*eq//price)),0)
+        txt=f"buy {n} sh ≈ ${n*price:,.0f} @ {price:.2f} now, stop {price*(1-STOP_PCT):.2f} (8% below current), risk ${n*ps:,.0f} (1% of equity, max 25% position)"
+    lab='<b style="color:#d62728">EXTENDED, DON\'T CHASE</b> — ' if ext else '<b style="color:#2ca02c">Within buy range</b> — '
+    r=info.loc[t] if t in info.index else None
+    nm=html.escape(str(names.get(t,''))) if t in names else ''
+    sc=f" · score {r.score}" if r is not None else ''
+    rows=(f'<table><tr><th>signal date</th><td>{sd}</td></tr><tr><th>signal close</th><td>{"%.2f"%sigpx if sigpx else "n/a"}</td></tr><tr><th>pivot</th><td>{e:.2f}</td></tr>'
+      f'<tr><th>current price</th><td><b>{price:.2f}</b></td></tr><tr><th>past pivot</th><td>{past:+.1f}%</td></tr><tr><th>don\'t chase above (pivot×1.05)</th><td>{chase:.2f}</td></tr>'
+      f'<tr><th>system stop</th><td>{p["stop"]:.2f}</td></tr></table>')
+    return f'<div class="card BUY"><b>{t}</b> {nm}{sc}<br>{lab}{"price is %.1f%% past pivot"%past}<br>{rows}<b style="font-size:12px">{html.escape(txt)}</b><br>{svg(t,e,p["stop"])}</div>'
+def newsection():
+    ts=sorted(newset,key=lambda t:-info.score.get(t,0))
+    body=''.join(newcard(t) for t in ts) or '<p><i>None</i></p>'
+    return f'<h2>BUY (new) ({len(ts)}) <small style="font-weight:normal">— BUY signal on {lastcomp or "n/a"} close or later; shown through the next trading day, then moves to HOLD</small></h2><div class="grid">{body}</div>'
 def section(k,title):
-    ts=[t for t,s in sig.items() if s==k]; ts.sort(key=lambda t:-info.score.get(t,0))
+    ts=[t for t,s in sig.items() if s==k and t not in newset]; ts.sort(key=lambda t:-info.score.get(t,0))
     body=''.join(card(t,k) for t in ts) or '<p><i>None</i></p>'
     return f'<h2>{title} ({len(ts)})</h2><div class="grid">{body}</div>'
 cols=['ticker','score','n_fail','fails','rs_rank','price','pivot','pct_from_pivot','contractions','base_weeks','vol_dryup_ratio','breakout_vol_ratio','eps_yoy','rev_yoy','sector']
@@ -176,7 +209,7 @@ table{{border-collapse:collapse;font-size:12px}}td,th{{border:1px solid #ddd;pad
 {banner}<p>Data as of <b>{asof}</b> (yfinance daily; intraday if run during market hours) · generated {now_mst:%Y-%m-%d %H:%M} MST ·
 universe S&amp;P 500 + NASDAQ 100 · Trend Template passers: {len(tt)} · full setups: {len(full)}</p>
 <p class="legend"><span style="color:#111">■ close</span><span style="color:#1f77b4">■ 50d</span><span style="color:#ff7f0e">■ 150d</span><span style="color:#d62728">■ 200d</span><span style="color:green">-- pivot/entry</span><span style="color:crimson">-- stop (-8%)</span> (last 120 sessions)</p>
-{acsec}{mysec}{section('BUY',"Today's BUY")}{section('WATCH','WATCH (full setup, ≤5% below pivot)')}{section('HOLD','HOLD')}{section('SELL','SELL')}
+{newsection()}{acsec}{mysec}{section('WATCH','WATCH (full setup, ≤5% below pivot)')}{section('HOLD','HOLD')}{section('SELL','SELL')}
 <h2>Cleanest setups (all {len(su)} Trend Template passers, click header to sort)</h2><table id="t"><thead><tr>{thead}</tr></thead><tbody>{rows}</tbody></table>
 <h2>Rules &amp; caveats</h2><div class="cav"><p>Score (0-100): 10/criterion passed (VCP, volume dry-up, pivot, fundamentals) + base length (≤30w) 10 + final contraction tightness 10 + dry-up 10 + pivot proximity 10 + RS 70→99 10 + EPS YoY (cap 100%) 5 + revenue YoY (cap 50%) 5.</p>
 <p>BUY: full setup, close &gt; pivot within last 3 sessions on ≥1.4× 50d volume, ≤5% past pivot; entry = pivot, stop = pivot −8%. WATCH: full setup 0–5% below pivot. HOLD: tracked position above stop and not below 50d SMA on heavy volume, still in Trend Template. SELL: close &lt; stop, or close &lt; 50d SMA on ≥1.4× volume, or fails Trend Template. Partial-profit flag at +20%.</p>
