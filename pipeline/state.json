@@ -4,43 +4,43 @@
    "entry": 153.96,
    "stop": 141.64,
    "since": "2026-10-20",
-   "last": 157.89,
-   "gain_pct": 2.6
+   "last": 155.17,
+   "gain_pct": 0.8
   },
   "TRV": {
    "entry": 385.37,
    "stop": 354.54,
    "since": "2026-10-20",
-   "last": 398.8,
-   "gain_pct": 3.5
+   "last": 395.41,
+   "gain_pct": 2.6
   },
   "STLD": {
    "entry": 243.58,
    "stop": 224.09,
    "since": "2026-10-20",
-   "last": 251.91,
-   "gain_pct": 3.4
+   "last": 247.66,
+   "gain_pct": 1.7
   },
   "CSX": {
    "entry": 49.22,
    "stop": 45.28,
    "since": "2026-10-22",
-   "last": 51.62,
-   "gain_pct": 4.9
+   "last": 50.72,
+   "gain_pct": 3.0
   },
   "NUE": {
    "entry": 264.62,
    "stop": 243.45,
    "since": "2026-10-28",
-   "last": 277.65,
-   "gain_pct": 4.9
+   "last": 273.53,
+   "gain_pct": 3.4
   },
   "XOM": {
    "entry": 184.88,
    "stop": 170.09,
    "since": "2026-10-30",
-   "last": 179.67,
-   "gain_pct": -2.8
+   "last": 177.46,
+   "gain_pct": -4.0
   }
  },
  "history": [
@@ -116,12 +116,17 @@
   "CSX": "HOLD",
   "NUE": "HOLD",
   "XOM": "HOLD",
-  "FANG": "WATCH",
+  "PSX": "WATCH",
   "CVX": "WATCH",
-  "COP": "WATCH",
-  "SJM": "WATCH",
+  "AMGN": "WATCH",
+  "NDSN": "WATCH",
+  "ABBV": "WATCH",
+  "OKE": "WATCH",
   "TRGP": "WATCH",
-  "BBY": "WATCH"
+  "WSM": "WATCH",
+  "ROST": "WATCH",
+  "DGX": "WATCH",
+  "SJM": "WATCH"
  },
  "runs": [
   {
@@ -439,6 +444,29 @@
     "SJM": "WATCH",
     "TRGP": "WATCH",
     "BBY": "WATCH"
+   }
+  },
+  {
+   "run": "2026-11-03T14:46",
+   "asof": "2026-11-03",
+   "signals": {
+    "EOG": "HOLD",
+    "TRV": "HOLD",
+    "STLD": "HOLD",
+    "CSX": "HOLD",
+    "NUE": "HOLD",
+    "XOM": "HOLD",
+    "PSX": "WATCH",
+    "CVX": "WATCH",
+    "AMGN": "WATCH",
+    "NDSN": "WATCH",
+    "ABBV": "WATCH",
+    "OKE": "WATCH",
+    "TRGP": "WATCH",
+    "WSM": "WATCH",
+    "ROST": "WATCH",
+    "DGX": "WATCH",
+    "SJM": "WATCH"
    }
   }
  ]
