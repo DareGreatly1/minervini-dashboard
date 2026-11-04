@@ -21,8 +21,8 @@
   "opened": "2026-11-02",
   "source": "user trade on system BUY 2026-10-30",
   "open": true,
-  "last": 177.46,
-  "last_status": "OK",
-  "last_run": "2026-11-03"
+  "last": 169.27,
+  "last_status": "SELL",
+  "last_run": "2026-11-04"
  }
 }
