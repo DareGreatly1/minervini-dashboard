@@ -4,50 +4,50 @@
    "entry": 385.37,
    "stop": 354.54,
    "since": "2026-10-20",
-   "last": 409.25,
-   "gain_pct": 6.2
-  },
-  "STLD": {
-   "entry": 243.58,
-   "stop": 224.09,
-   "since": "2026-10-20",
-   "last": 240.12,
-   "gain_pct": -1.4
+   "last": 402.89,
+   "gain_pct": 4.5
   },
   "CSX": {
    "entry": 49.22,
    "stop": 45.28,
    "since": "2026-10-22",
-   "last": 52.05,
-   "gain_pct": 5.7
-  },
-  "NUE": {
-   "entry": 264.62,
-   "stop": 243.45,
-   "since": "2026-10-28",
-   "last": 267.91,
-   "gain_pct": 1.2
+   "last": 50.83,
+   "gain_pct": 3.3
   },
   "AMGN": {
    "entry": 475.65,
    "stop": 437.6,
    "since": "2026-11-04",
-   "last": 478.48,
-   "gain_pct": 0.6
+   "last": 460.28,
+   "gain_pct": -3.2
   },
   "ROST": {
    "entry": 235.71,
    "stop": 216.85,
    "since": "2026-11-04",
-   "last": 245.74,
-   "gain_pct": 4.3
+   "last": 235.23,
+   "gain_pct": -0.2
   },
   "AIZ": {
    "entry": 297.76,
    "stop": 273.94,
    "since": "2026-11-04",
-   "last": 308.52,
-   "gain_pct": 3.6
+   "last": 306.87,
+   "gain_pct": 3.1
+  },
+  "GWW": {
+   "entry": 1389.23,
+   "stop": 1278.09,
+   "since": "2026-11-05",
+   "last": 1451.39,
+   "gain_pct": 4.5
+  },
+  "CAH": {
+   "entry": 259.84,
+   "stop": 239.05,
+   "since": "2026-11-05",
+   "last": 267.82,
+   "gain_pct": 3.1
   }
  },
  "history": [
@@ -154,20 +154,54 @@
    "price": 308.52,
    "entry": 297.76,
    "reason": "breakout +3.6% past pivot 297.76 on 2.48x vol; stop 273.94"
+  },
+  {
+   "date": "2026-11-05",
+   "ticker": "STLD",
+   "signal": "SELL",
+   "price": 221.9,
+   "entry": 243.58,
+   "reason": "close 221.90 < stop 224.09; closed below 50d SMA on heavy volume; failed Trend Template"
+  },
+  {
+   "date": "2026-11-05",
+   "ticker": "NUE",
+   "signal": "SELL",
+   "price": 245.68,
+   "entry": 264.62,
+   "reason": "closed below 50d SMA on heavy volume; failed Trend Template"
+  },
+  {
+   "date": "2026-11-05",
+   "ticker": "GWW",
+   "signal": "BUY",
+   "price": 1451.39,
+   "entry": 1389.23,
+   "reason": "breakout +4.5% past pivot 1389.23 on 1.58x vol; stop 1278.09"
+  },
+  {
+   "date": "2026-11-05",
+   "ticker": "CAH",
+   "signal": "BUY",
+   "price": 267.82,
+   "entry": 259.84,
+   "reason": "breakout +3.1% past pivot 259.84 on 1.43x vol; stop 239.05"
   }
  ],
  "last_signals": {
-  "EOG": "SELL",
   "TRV": "HOLD",
-  "STLD": "HOLD",
+  "STLD": "SELL",
   "CSX": "HOLD",
-  "NUE": "HOLD",
-  "XOM": "SELL",
-  "AMGN": "BUY",
-  "DGX": "WATCH",
-  "NDSN": "WATCH",
-  "ROST": "BUY",
-  "AIZ": "BUY"
+  "NUE": "SELL",
+  "AMGN": "HOLD",
+  "ROST": "HOLD",
+  "AIZ": "HOLD",
+  "VEEV": "WATCH",
+  "TGT": "WATCH",
+  "GWW": "BUY",
+  "WSM": "WATCH",
+  "HUM": "WATCH",
+  "CAH": "BUY"
  },
  "runs": [
   {
@@ -525,6 +559,25 @@
     "NDSN": "WATCH",
     "ROST": "BUY",
     "AIZ": "BUY"
+   }
+  },
+  {
+   "run": "2026-11-05T14:42",
+   "asof": "2026-11-05",
+   "signals": {
+    "TRV": "HOLD",
+    "STLD": "SELL",
+    "CSX": "HOLD",
+    "NUE": "SELL",
+    "AMGN": "HOLD",
+    "ROST": "HOLD",
+    "AIZ": "HOLD",
+    "VEEV": "WATCH",
+    "TGT": "WATCH",
+    "GWW": "BUY",
+    "WSM": "WATCH",
+    "HUM": "WATCH",
+    "CAH": "BUY"
    }
   }
  ]
