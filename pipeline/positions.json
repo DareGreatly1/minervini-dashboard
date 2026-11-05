@@ -1,28 +1,30 @@
 {
- "ALL": {
-  "name": "Allstate",
-  "shares": 8,
-  "entry": 245.395,
-  "stop": 225.76,
-  "opened": "2026-10-22",
-  "source": "user (manual trade, not a system signal)",
-  "open": false,
-  "last": 257.98,
-  "last_status": "WARNING",
-  "last_run": "2026-10-22",
-  "exit_price": 258.02,
-  "exit_date": "2026-10-22"
- },
- "XOM": {
-  "name": "Exxon Mobil",
-  "shares": 7,
-  "entry": 185.44,
-  "stop": 170.6,
-  "opened": "2026-11-02",
-  "source": "user trade on system BUY 2026-10-30",
-  "open": true,
-  "last": 169.27,
-  "last_status": "SELL",
-  "last_run": "2026-11-04"
- }
+  "ALL": {
+    "name": "Allstate",
+    "shares": 8,
+    "entry": 245.395,
+    "stop": 225.76,
+    "opened": "2026-10-22",
+    "source": "user (manual trade, not a system signal)",
+    "open": false,
+    "last": 257.98,
+    "last_status": "WARNING",
+    "last_run": "2026-10-22",
+    "exit_price": 258.02,
+    "exit_date": "2026-10-22"
+  },
+  "XOM": {
+    "name": "Exxon Mobil",
+    "shares": 7,
+    "entry": 185.44,
+    "stop": 170.6,
+    "opened": "2026-11-02",
+    "source": "user trade on system BUY 2026-10-30",
+    "open": false,
+    "last": 169.27,
+    "last_status": "SELL",
+    "last_run": "2026-11-04",
+    "exit_price": 171.3,
+    "exit_date": "2026-11-05"
+  }
 }
