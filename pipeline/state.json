@@ -4,50 +4,50 @@
    "entry": 385.37,
    "stop": 354.54,
    "since": "2026-10-20",
-   "last": 402.89,
-   "gain_pct": 4.5
+   "last": 395.2,
+   "gain_pct": 2.6
   },
   "CSX": {
    "entry": 49.22,
    "stop": 45.28,
    "since": "2026-10-22",
-   "last": 50.83,
-   "gain_pct": 3.3
+   "last": 49.12,
+   "gain_pct": -0.2
   },
   "AMGN": {
    "entry": 475.65,
    "stop": 437.6,
    "since": "2026-11-04",
-   "last": 460.28,
+   "last": 460.42,
    "gain_pct": -3.2
-  },
-  "ROST": {
-   "entry": 235.71,
-   "stop": 216.85,
-   "since": "2026-11-04",
-   "last": 235.23,
-   "gain_pct": -0.2
   },
   "AIZ": {
    "entry": 297.76,
    "stop": 273.94,
    "since": "2026-11-04",
-   "last": 306.87,
+   "last": 307.0,
    "gain_pct": 3.1
   },
   "GWW": {
    "entry": 1389.23,
    "stop": 1278.09,
    "since": "2026-11-05",
-   "last": 1451.39,
-   "gain_pct": 4.5
+   "last": 1440.7,
+   "gain_pct": 3.7
   },
   "CAH": {
    "entry": 259.84,
    "stop": 239.05,
    "since": "2026-11-05",
-   "last": 267.82,
-   "gain_pct": 3.1
+   "last": 271.72,
+   "gain_pct": 4.6
+  },
+  "HUM": {
+   "entry": 422.65,
+   "stop": 388.84,
+   "since": "2026-11-06",
+   "last": 433.74,
+   "gain_pct": 2.6
   }
  },
  "history": [
@@ -186,22 +186,37 @@
    "price": 267.82,
    "entry": 259.84,
    "reason": "breakout +3.1% past pivot 259.84 on 1.43x vol; stop 239.05"
+  },
+  {
+   "date": "2026-11-06",
+   "ticker": "ROST",
+   "signal": "SELL",
+   "price": 231.09,
+   "entry": 235.71,
+   "reason": "failed Trend Template"
+  },
+  {
+   "date": "2026-11-06",
+   "ticker": "HUM",
+   "signal": "BUY",
+   "price": 433.74,
+   "entry": 422.65,
+   "reason": "breakout +2.6% past pivot 422.65 on 2.01x vol; stop 388.84"
   }
  ],
  "last_signals": {
   "TRV": "HOLD",
-  "STLD": "SELL",
   "CSX": "HOLD",
-  "NUE": "SELL",
   "AMGN": "HOLD",
-  "ROST": "HOLD",
+  "ROST": "SELL",
   "AIZ": "HOLD",
+  "GWW": "HOLD",
+  "CAH": "HOLD",
   "VEEV": "WATCH",
-  "TGT": "WATCH",
-  "GWW": "BUY",
-  "WSM": "WATCH",
-  "HUM": "WATCH",
-  "CAH": "BUY"
+  "SJM": "WATCH",
+  "HUM": "BUY",
+  "DGX": "WATCH",
+  "WSM": "WATCH"
  },
  "runs": [
   {
@@ -578,6 +593,24 @@
     "WSM": "WATCH",
     "HUM": "WATCH",
     "CAH": "BUY"
+   }
+  },
+  {
+   "run": "2026-11-06T14:49",
+   "asof": "2026-11-06",
+   "signals": {
+    "TRV": "HOLD",
+    "CSX": "HOLD",
+    "AMGN": "HOLD",
+    "ROST": "SELL",
+    "AIZ": "HOLD",
+    "GWW": "HOLD",
+    "CAH": "HOLD",
+    "VEEV": "WATCH",
+    "SJM": "WATCH",
+    "HUM": "BUY",
+    "DGX": "WATCH",
+    "WSM": "WATCH"
    }
   }
  ]
