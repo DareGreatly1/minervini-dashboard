@@ -4,15 +4,15 @@
    "entry": 385.37,
    "stop": 354.54,
    "since": "2026-10-20",
-   "last": 395.2,
-   "gain_pct": 2.6
+   "last": 400.78,
+   "gain_pct": 4.0
   },
   "CSX": {
    "entry": 49.22,
    "stop": 45.28,
    "since": "2026-10-22",
-   "last": 50.48,
-   "gain_pct": 2.6
+   "last": 51.08,
+   "gain_pct": 3.8
   },
   "AMGN": {
    "entry": 475.65,
@@ -25,29 +25,29 @@
    "entry": 297.76,
    "stop": 273.94,
    "since": "2026-11-04",
-   "last": 317.21,
-   "gain_pct": 6.5
+   "last": 322.16,
+   "gain_pct": 8.2
   },
   "GWW": {
    "entry": 1389.23,
    "stop": 1278.09,
    "since": "2026-11-05",
-   "last": 1447.67,
-   "gain_pct": 4.2
+   "last": 1472.91,
+   "gain_pct": 6.0
   },
   "CAH": {
    "entry": 259.84,
    "stop": 239.05,
    "since": "2026-11-05",
-   "last": 274.29,
-   "gain_pct": 5.6
+   "last": 276.79,
+   "gain_pct": 6.5
   },
   "HUM": {
    "entry": 422.65,
    "stop": 388.84,
    "since": "2026-11-06",
-   "last": 423.22,
-   "gain_pct": 0.1
+   "last": 438.06,
+   "gain_pct": 3.6
   }
  },
  "history": [
@@ -212,9 +212,10 @@
   "GWW": "HOLD",
   "CAH": "HOLD",
   "HUM": "HOLD",
-  "VEEV": "WATCH",
-  "SJM": "WATCH",
-  "WSM": "WATCH"
+  "DGX": "WATCH",
+  "MRNA": "WATCH",
+  "CF": "WATCH",
+  "VEEV": "WATCH"
  },
  "runs": [
   {
@@ -625,6 +626,23 @@
     "VEEV": "WATCH",
     "SJM": "WATCH",
     "WSM": "WATCH"
+   }
+  },
+  {
+   "run": "2026-11-10T14:41",
+   "asof": "2026-11-10",
+   "signals": {
+    "TRV": "HOLD",
+    "CSX": "HOLD",
+    "AMGN": "HOLD",
+    "AIZ": "HOLD",
+    "GWW": "HOLD",
+    "CAH": "HOLD",
+    "HUM": "HOLD",
+    "DGX": "WATCH",
+    "MRNA": "WATCH",
+    "CF": "WATCH",
+    "VEEV": "WATCH"
    }
   }
  ]
