@@ -1,6 +1,25 @@
 import pandas as pd, yfinance as yf, numpy as np, warnings; warnings.filterwarnings('ignore')
 tp=pd.read_csv('minervini_screen.csv'); tk=list(tp.ticker)
 d=yf.download(tk,period='2y',auto_adjust=True,progress=False)
+def ohlcv(t):
+  try:
+    H=d['High'][t].dropna();L=d['Low'][t].dropna();C=d['Close'][t].dropna();V=d['Volume'][t].dropna()
+    if len(C)>=260 and len(H)>=60 and len(L)>=60 and len(V)>=60:
+      return H,L,C,V
+  except Exception:
+    pass
+  try:
+    x=yf.download(t,period='2y',auto_adjust=True,progress=False)
+    if x is None or getattr(x,'empty',True):
+      print(f'skip {t}: no price data')
+      return None
+    H=x['High'].dropna();L=x['Low'].dropna();C=x['Close'].dropna();V=x['Volume'].dropna()
+    if len(C)>=260 and len(H)>=60 and len(L)>=60 and len(V)>=60:
+      return H,L,C,V
+    print(f'skip {t}: insufficient bars ({len(C)} close)')
+  except Exception as e:
+    print(f'skip {t}: {e}')
+  return None
 def zig(h,l,th=0.03):
   # alternating swing highs/lows starting from a high
   piv=[('H',0,h[0])]; 
@@ -30,13 +49,23 @@ def fund(t):
   except Exception as e: return {'eps':None,'rev':None,'err':str(e)}
 rows=[]
 for t in tk:
-  H=d['High'][t].dropna();L=d['Low'][t].dropna();C=d['Close'][t].dropna();V=d['Volume'][t].dropna()
+  got=ohlcv(t)
+  if not got:
+    continue
+  H,L,C,V=got
   n=len(C); base_end=n-3  # exclude last 3 days for base definition
   w=H.iloc[max(0,base_end-325):base_end]
-  start=w.values.argmax()+max(0,base_end-325)
+  if w.empty:
+    print(f'skip {t}: empty base window')
+    continue
+  start=int(w.values.argmax())+max(0,base_end-325)
   blen=(base_end-start)/5
   if blen<3:  # just made highs; look further back for prior base: use highest high before a 3wk window
-    w2=H.iloc[max(0,base_end-325):base_end-15]; start=w2.values.argmax()+max(0,base_end-325); blen=(base_end-start)/5
+    w2=H.iloc[max(0,base_end-325):base_end-15]
+    if w2.empty:
+      print(f'skip {t}: empty prior-base window')
+      continue
+    start=int(w2.values.argmax())+max(0,base_end-325); blen=(base_end-start)/5
   piv=zig(H.values[start:base_end],L.values[start:base_end])
   cons=[];pivot=None
   for a,b in zip(piv,piv[1:]):
@@ -52,6 +81,9 @@ for t in tk:
   a_ok= 3<=blen<=65 and len(seq)>=2 and seq[-1]<=12
   v50=V.iloc[-53:-3].mean(); dry=V.iloc[-13:-3].mean()/v50
   b_ok=dry<1
+  if pivot is None:
+    print(f'skip {t}: no pivot')
+    continue
   p=C.iloc[-1]; pfp=(p/pivot-1)*100
   bo=[i for i in range(n-3,n) if C.iloc[i]>pivot and C.iloc[i-1]<=pivot]
   bov=(V.iloc[bo[0]]/v50) if bo else None
