@@ -6,6 +6,10 @@ import pandas as pd, numpy as np, yfinance as yf
 D=os.path.dirname(os.path.abspath(__file__)); os.chdir(D)
 INTRADAY=os.environ.get('INTRADAY')=='1'
 STOP_PCT=0.08; PARTIAL=0.20; BOVOL=1.4
+# A+ grading (added 2026-11-18 from backtest in backtest/): only A+ breakouts become BUYs, sized bigger.
+APLUS_RISK=2.0; APLUS_CAP=0.35   # % of equity risked per A+ trade; max position as fraction of equity
+LEGACY_RISK=1.0; LEGACY_CAP=0.25 # sizing shown for older (pre-A+) system positions
+APLUS_RS=90; APLUS_RS_LINE=80; MAX_DIST_DAYS=5
 def run(s):
     r=subprocess.run([sys.executable,s],capture_output=True,text=True)
     if r.returncode: print(r.stderr); sys.exit(f'{s} failed')
@@ -38,6 +42,61 @@ need=sorted(set(full.ticker)|set(pos)|set(su.head(10).ticker)|set(myopen))
 px=yf.download(need,period='1y',auto_adjust=True,progress=False)
 asof=str(px.index[-1].date())
 def series(t): return px['Close'][t].dropna(),px['Volume'][t].dropna()
+# ---- A+ grading inputs: market regime, RS line, earnings (never breaks the run)
+MKT={'ok':None,'txt':'market data unavailable','spy':{},'qqq':{},'dist':None}
+try:
+    mk=yf.download(['SPY','QQQ'],period='2y',auto_adjust=True,progress=False)
+    def _reg(sym):
+        c=mk['Close'][sym].dropna(); a50=c.rolling(50).mean(); a200=c.rolling(200).mean()
+        chk={'above 50d':bool(c.iloc[-1]>a50.iloc[-1]),'50d rising':bool(a50.iloc[-1]>a50.iloc[-11]),'above 200d':bool(c.iloc[-1]>a200.iloc[-1]),'200d rising':bool(a200.iloc[-1]>a200.iloc[-21])}
+        return dict(px=round(float(c.iloc[-1]),2),m50=round(float(a50.iloc[-1]),2),m200=round(float(a200.iloc[-1]),2),chk=chk,ok=all(chk.values()))
+    _sc,_sv=mk['Close']['SPY'].dropna(),mk['Volume']['SPY'].dropna()
+    _dd=((_sc.pct_change()<=-0.002)&(_sv>_sv.shift(1))).astype(int)
+    MKT['spy'],MKT['qqq'],MKT['dist']=_reg('SPY'),_reg('QQQ'),int(_dd.iloc[-25:].sum())
+    MKT['ok']=MKT['spy']['ok'] and MKT['qqq']['ok'] and MKT['dist']<=MAX_DIST_DAYS
+    _fl={'above 50d':'below 50d','50d rising':'50d falling','above 200d':'below 200d','200d rising':'200d falling'}
+    bad=[f"{k} {_fl[n]}" for k,d in (('SPY',MKT['spy']),('QQQ',MKT['qqq'])) for n,v in d['chk'].items() if not v]
+    if MKT['dist']>MAX_DIST_DAYS: bad.append(f"{MKT['dist']} distribution days in 25 sessions (max {MAX_DIST_DAYS})")
+    MKT['txt']='uptrend: SPY & QQQ above rising 50d and 200d, %d distribution days'%MKT['dist'] if MKT['ok'] else 'NOT OK: '+'; '.join(bad)
+    _spy=mk['Close']['SPY'].dropna()
+except Exception as e:
+    print('market regime failed:',e); _spy=None
+def rsl_off(t):
+    try:
+        c,_=series(t); r=(c/_spy.reindex(c.index)).dropna().iloc[-252:]; return float(r.iloc[-1]/r.max()-1)
+    except Exception: return None
+from concurrent.futures import ThreadPoolExecutor
+def _earn(t):
+    try:
+        e=yf.Ticker(t).get_earnings_dates(limit=12); ds=sorted({x.date() for x in e.index}) if e is not None else []
+        return t,ds
+    except Exception: return t,None
+_today=pd.Timestamp(asof).date()
+_cand=[r.ticker for r in full.itertuples() if -5<=r.pct_from_pivot<=5]
+try:
+    with ThreadPoolExecutor(6) as _ex: EARN=dict(_ex.map(_earn,_cand))
+except Exception: EARN={}
+def earn_info(t):
+    ds=EARN.get(t)
+    if not ds: return None,None
+    prv=[d for d in ds if d<=_today]; nxt=[d for d in ds if d>_today]
+    return ((_today-prv[-1]).days if prv else None),((nxt[0]-_today).days if nxt else None)
+GR={}
+def grade(r):
+    t=r.ticker; ok=[]; miss=[]
+    if MKT['ok']: ok.append('market uptrend')
+    else: miss.append('market not in uptrend' if MKT['ok'] is False else 'market data unavailable')
+    ro=rsl_off(t); rs=int(r.rs_rank); rl=ro is not None and ro>=-0.01
+    if rs>=APLUS_RS: ok.append(f'RS {rs}')
+    elif rs>=APLUS_RS_LINE and rl: ok.append(f'RS {rs} + RS line at new high')
+    else: miss.append(f'leadership (RS {rs} < {APLUS_RS}' + ('' if rs<APLUS_RS_LINE else ', RS line %.1f%% below high'%(-ro*100 if ro is not None else 0)) + ')')
+    se,ne=earn_info(t)
+    if se is not None and se<=1: miss.append(f'earnings-day move (reported {se}d ago)')
+    else: ok.append('not an earnings-day gap')
+    info_e=(f'next earnings in {ne}d' if ne is not None else 'next earnings date unknown')
+    g=dict(aplus=not miss,ok=ok,miss=miss,next_earn=ne,since_earn=se,earn_txt=info_e,rsl=ro)
+    g['label']=('A+' if g['aplus'] else 'not A+')+(' — ' + ('; '.join(ok)) if g['aplus'] else ' — missing: '+'; '.join(miss))
+    GR[t]=g; return g
 sig={}; notes={}
 # existing positions -> HOLD/SELL
 ttset=set(tt.ticker)
@@ -56,13 +115,18 @@ for t,p in list(pos.items()):
 for _,r in full.iterrows():
     t=r.ticker
     if t in pos or t in sig: continue
-    if pd.notna(r.breakout_vol_ratio) and r.breakout_vol_ratio>=BOVOL and 0<r.pct_from_pivot<=5:
+    brk=pd.notna(r.breakout_vol_ratio) and r.breakout_vol_ratio>=BOVOL and 0<r.pct_from_pivot<=5
+    if not (brk or -5<=r.pct_from_pivot<=0): continue
+    g=grade(r)
+    if brk and g['aplus']:
         sig[t]='BUY'; stop=round(r.pivot*(1-STOP_PCT),2)
-        pos[t]={'entry':float(r.pivot),'stop':stop,'since':asof,'last':float(r.price),'gain_pct':round(r.pct_from_pivot,1)}
-        notes[t]=f"breakout {r.pct_from_pivot:+.1f}% past pivot {r.pivot} on {r.breakout_vol_ratio}x vol; stop {stop}"
-        st['history'].append({'date':asof,'ticker':t,'signal':'BUY','price':float(r.price),'entry':float(r.pivot),'reason':notes[t]})
-    elif -5<=r.pct_from_pivot<=0:
-        sig[t]='WATCH'; notes[t]=f"{r.pct_from_pivot:+.1f}% below pivot {r.pivot}; buy on close > pivot with vol >= {BOVOL}x 50d"
+        pos[t]={'entry':float(r.pivot),'stop':stop,'since':asof,'last':float(r.price),'gain_pct':round(r.pct_from_pivot,1),'grade':'A+'}
+        notes[t]=f"A+ breakout {r.pct_from_pivot:+.1f}% past pivot {r.pivot} on {r.breakout_vol_ratio}x vol; stop {stop} | {'; '.join(g['ok'])}; {g['earn_txt']}"
+        st['history'].append({'date':asof,'ticker':t,'signal':'BUY','grade':'A+','price':float(r.price),'entry':float(r.pivot),'reason':notes[t]})
+    elif brk:
+        sig[t]='WATCH'; notes[t]=f"broke out {r.pct_from_pivot:+.1f}% past pivot {r.pivot} on {r.breakout_vol_ratio}x vol but NOT A+, no buy. Missing: {'; '.join(g['miss'])}"
+    else:
+        sig[t]='WATCH'; notes[t]=f"{r.pct_from_pivot:+.1f}% below pivot {r.pivot}; buy only if A+ and close > pivot on vol >= {BOVOL}x 50d. "+(f"A+ ready ({'; '.join(g['ok'])})" if g['aplus'] else f"Missing for A+: {'; '.join(g['miss'])}")+f"; {g['earn_txt']}"
 # ---- changes vs prev
 prev=st.get('last_signals',{})
 changes=[f"- {t}: {prev.get(t,'—')} → {sig.get(t,'—')}" for t in sorted(set(prev)|set(sig)) if prev.get(t)!=sig.get(t)]
@@ -121,24 +185,34 @@ def size(t):
         if not e: return None
         sp=p.get('stop', round(e*(1-STOP_PCT),2)); ps=e-sp
         if ps<=0: return None
-        rd=eq*rp/100; n=int(rd//ps); n=min(n,int(cash//e),int(0.25*eq//e))
-        return dict(sh=max(n,0),cost=round(max(n,0)*e,2),risk=round(max(n,0)*ps,2),entry=round(e,2),stop=sp)
+        ap=(p.get('grade')=='A+') if p else GR.get(t,{}).get('aplus',False)
+        if not ap and not p: return dict(no=True)
+        rpx,cap=(APLUS_RISK,APLUS_CAP) if ap else (LEGACY_RISK,LEGACY_CAP)
+        rd=eq*rpx/100; n=int(rd//ps); n=min(n,int(cash//e),int(cap*eq//e))
+        return dict(sh=max(n,0),cost=round(max(n,0)*e,2),risk=round(max(n,0)*ps,2),entry=round(e,2),stop=sp,rp=rpx,cap=cap)
     except Exception: return None
 def sztxt(t,k):
     z=size(t)
     if not z: return ''
-    return f"{'If it breaks out: ' if k=='WATCH' else ''}buy {z['sh']} sh ≈ ${z['cost']:,.0f} @ {z['entry']}, risk ${z['risk']:,.0f} (stop {z['stop']})"
+    if z.get('no'): return 'Not A+: no buy, even on a breakout'
+    return f"{'If it breaks out (A+ sizing): ' if k=='WATCH' else ''}buy {z['sh']} sh ≈ ${z['cost']:,.0f} @ {z['entry']}, risk ${z['risk']:,.0f} = {z['rp']:g}% of equity (stop {z['stop']})"
 if AC:
     pl=eq-start
-    acsec=f'<h2>Account</h2><table><tr><th>starting balance</th><th>cash</th><th>open positions</th><th>total equity</th><th>P&amp;L vs start</th><th>risk/trade</th></tr><tr><td>${start:,.2f}</td><td>${cash:,.2f}</td><td>${openval:,.2f}</td><td><b>${eq:,.2f}</b></td><td>{pl:+,.2f} ({pl/start*100:+.2f}%)</td><td>{rp}% = ${eq*rp/100:,.2f}</td></tr></table><p class="cav">Cash as of {html.escape(str(AC.get("as_of","")))} (update account.json after trades). Suggested shares = floor(risk$ / (entry−stop)), capped at available cash and 25% of equity.</p>'
+    acsec=f'<h2>Account</h2><table><tr><th>starting balance</th><th>cash</th><th>open positions</th><th>total equity</th><th>P&amp;L vs start</th><th>risk/trade</th></tr><tr><td>${start:,.2f}</td><td>${cash:,.2f}</td><td>${openval:,.2f}</td><td><b>${eq:,.2f}</b></td><td>{pl:+,.2f} ({pl/start*100:+.2f}%)</td><td>A+: {APLUS_RISK:g}% = ${eq*APLUS_RISK/100:,.2f}</td></tr></table><p class="cav">Cash as of {html.escape(str(AC.get("as_of","")))} (update account.json after trades). Suggested shares for <b>A+</b> buys = floor({APLUS_RISK:g}% of equity / (entry−stop)), capped at available cash and {APLUS_CAP*100:.0f}% of equity. Older non-A+ system positions keep {LEGACY_RISK:g}% / {LEGACY_CAP*100:.0f}%.</p>'
 else: acsec='<h2>Account</h2><p><i>account.json missing</i></p>'
 info=su.set_index('ticker'); names=tt.set_index('ticker')['name'] if 'name' in tt else {}
+def gbadge(t):
+    g=GR.get(t); gp=pos.get(t,{}).get('grade')
+    if gp=='A+' or (g and g['aplus']): return '<span style="background:#2ca02c;color:#fff;padding:1px 6px;border-radius:4px;font-weight:bold">'+('A+' if gp=='A+' else 'A+ ready')+'</span> '
+    if g: return '<span style="background:#999;color:#fff;padding:1px 6px;border-radius:4px">not A+</span> <small style="color:#b45309">missing: '+html.escape('; '.join(g['miss']))+'</small><br>'
+    if t in pos: return '<span style="background:#bbb;color:#fff;padding:1px 6px;border-radius:4px">pre-A+ signal</span> '
+    return ''
 def card(t,kind):
     r=info.loc[t] if t in info.index else None; p=pos.get(t,{})
     pv=p.get('entry', r.pivot if r is not None else None); sp=p.get('stop', round(pv*(1-STOP_PCT),2) if pv else None)
     nm=html.escape(str(names.get(t,''))) if t in names else ''
     sc=f" · score {r.score}" if r is not None else ''
-    return f'<div class="card {kind}"><b>{t}</b> {nm}{sc}<br><small>{html.escape(notes.get(t,""))}</small><br><b style="font-size:12px">{html.escape(sztxt(t,kind))}</b><br>{svg(t,pv,sp)}</div>'
+    return f'<div class="card {kind}"><b>{t}</b> {nm}{sc}<br>{gbadge(t)}<small>{html.escape(notes.get(t,""))}</small><br><b style="font-size:12px">{html.escape(sztxt(t,kind)) if kind in ('BUY','WATCH') else ''}</b><br>{svg(t,pv,sp)}</div>'
 
 # ---- BUY (new): tracked positions whose BUY came on the last completed session before today (or today)
 def _newset():
@@ -158,8 +232,9 @@ def newcard(t):
     past=(price/e-1)*100; chase=e*1.05; ext=past>5
     txt=''
     if AC:
-        ps=price*STOP_PCT; rd=eq*rp/100; n=int(rd//ps); n=max(min(n,int(cash//price),int(0.25*eq//price)),0)
-        txt=f"buy {n} sh ≈ ${n*price:,.0f} @ {price:.2f} now, stop {price*(1-STOP_PCT):.2f} (8% below current), risk ${n*ps:,.0f} (1% of equity, max 25% position)"
+        ap=p.get('grade')=='A+'; rpx,cap=(APLUS_RISK,APLUS_CAP) if ap else (LEGACY_RISK,LEGACY_CAP)
+        spx=p['stop']; ps=price-spx; n=int(eq*rpx/100//ps) if ps>0 else 0; n=max(min(n,int(cash//price),int(cap*eq//price)),0)
+        txt=f"buy {n} sh ≈ ${n*price:,.0f} @ {price:.2f} now, stop {spx:.2f} (system stop, pivot −8%), risk ${n*max(ps,0):,.0f} ({rpx:g}% of equity, max {cap*100:.0f}% position)"
     lab='<b style="color:#d62728">EXTENDED, DON\'T CHASE</b> — ' if ext else '<b style="color:#2ca02c">Within buy range</b> — '
     r=info.loc[t] if t in info.index else None
     nm=html.escape(str(names.get(t,''))) if t in names else ''
@@ -167,7 +242,7 @@ def newcard(t):
     rows=(f'<table><tr><th>signal date</th><td>{sd}</td></tr><tr><th>signal close</th><td>{"%.2f"%sigpx if sigpx else "n/a"}</td></tr><tr><th>pivot</th><td>{e:.2f}</td></tr>'
       f'<tr><th>current price</th><td><b>{price:.2f}</b></td></tr><tr><th>past pivot</th><td>{past:+.1f}%</td></tr><tr><th>don\'t chase above (pivot×1.05)</th><td>{chase:.2f}</td></tr>'
       f'<tr><th>system stop</th><td>{p["stop"]:.2f}</td></tr></table>')
-    return f'<div class="card BUY"><b>{t}</b> {nm}{sc}<br>{lab}{"price is %.1f%% past pivot"%past}<br>{rows}<b style="font-size:12px">{html.escape(txt)}</b><br>{svg(t,e,p["stop"])}</div>'
+    return f'<div class="card BUY"><b>{t}</b> {nm}{sc}<br>{gbadge(t)}<small>{html.escape(notes.get(t,""))}</small><br>{lab}{"price is %.1f%% past pivot"%past}<br>{rows}<b style="font-size:12px">{html.escape(txt)}</b><br>{svg(t,e,p["stop"])}</div>'
 def newsection():
     ts=sorted(newset,key=lambda t:-info.score.get(t,0))
     body=''.join(newcard(t) for t in ts) or '<p><i>None</i></p>'
@@ -177,7 +252,7 @@ def section(k,title):
     body=''.join(card(t,k) for t in ts) or '<p><i>None</i></p>'
     return f'<h2>{title} ({len(ts)})</h2><div class="grid">{body}</div>'
 cols=['ticker','score','n_fail','fails','rs_rank','price','pivot','pct_from_pivot','contractions','base_weeks','vol_dryup_ratio','breakout_vol_ratio','eps_yoy','rev_yoy','sector']
-tbl=su[cols].copy(); tbl.insert(1,'signal',tbl.ticker.map(sig).fillna(''))
+tbl=su[cols].copy(); tbl.insert(1,'signal',tbl.ticker.map(sig).fillna('')); tbl.insert(2,'grade',tbl.ticker.map(lambda t:('A+' if GR[t]['aplus'] else 'missing: '+'; '.join(GR[t]['miss'])) if t in GR else ''))
 thead=''.join(f'<th onclick="srt({i})">{c}</th>' for i,c in enumerate(tbl.columns))
 rows=''.join('<tr>'+''.join(f'<td>{html.escape("" if pd.isna(v) else str(v))}</td>' for v in r)+'</tr>' for r in tbl.itertuples(index=False))
 def mysvg(t,entry,stop):
@@ -196,7 +271,12 @@ mysec='<h2>My Positions (%d) <small style="font-weight:normal">— prices as of 
  f'<tr><td>{d["shares"]}</td><td>{d["entry"]}</td><td>{d["price"]}</td><td>{d["pl"]:+.2f}</td><td>{d["plp"]:+.2f}%</td><td>{d["stop"]}</td><td>{d["to_stop"]}%</td><td>{d["sma50"]}</td><td>{d["volr"]}</td><td>{d["rs"]}</td></tr></table>'
  f'<small>{html.escape(d["why"])}</small><br>{mysvg(d["t"],d["entry"],d["stop"])}</div>' for d in mysum)+('</div>' if mysum else '<p><i>None</i></p></div>')
 now_mst=dt.datetime.utcnow()-dt.timedelta(hours=7)
-banner=(f'<p style="background:#fff3cd;border:1px solid #e6b800;padding:8px;border-radius:6px"><b>Intraday refresh as of {now_mst:%H:%M} MST, provisional until close.</b> Prices are live; signals are not recorded and the daily close run is authoritative.</p>' if INTRADAY else '')
+_mc,_mb=('#e8f5e9','#2ca02c') if MKT['ok'] else ('#fdecea','#d62728')
+def _mrow(n,d): return f"<td>{n}</td><td>{d.get('px','')}</td><td>{d.get('m50','')}</td><td>{d.get('m200','')}</td><td>{', '.join({'above 50d':'below 50d','50d rising':'50d falling','above 200d':'below 200d','200d rising':'200d falling'}[k] for k,v in d.get('chk',{}).items() if not v) or 'all OK'}</td>"
+mktbanner=(f'<div style="background:{_mc};border:2px solid {_mb};padding:8px 12px;border-radius:6px;margin:8px 0"><b style="font-size:17px;color:{_mb}">'
+  +('Market OK: A+ breakouts can be bought' if MKT['ok'] else 'Market NOT OK: take no new buys')+f'</b><br><small>{html.escape(MKT["txt"])}</small>'
+  +(f'<table style="margin-top:4px"><tr><th>index</th><th>close</th><th>50d</th><th>200d</th><th>problems</th></tr><tr>{_mrow("SPY",MKT["spy"])}</tr><tr>{_mrow("QQQ",MKT["qqq"])}</tr></table><small>Distribution days (SPY down ≥0.2% on higher volume) in last 25 sessions: <b>{MKT["dist"]}</b> (max {MAX_DIST_DAYS})</small>' if MKT['spy'] else '')+'</div>')
+banner=mktbanner+(f'<p style="background:#fff3cd;border:1px solid #e6b800;padding:8px;border-radius:6px"><b>Intraday refresh as of {now_mst:%H:%M} MST, provisional until close.</b> Prices are live; signals are not recorded and the daily close run is authoritative.</p>' if INTRADAY else '')
 page=f'''<!doctype html><html><head><meta charset="utf-8"><title>Minervini Dashboard {asof}</title><style>
 body{{font-family:system-ui,sans-serif;margin:20px;color:#222}}.grid{{display:flex;flex-wrap:wrap;gap:10px}}
 .card{{border:1px solid #ccc;border-radius:6px;padding:8px;width:330px;border-left:6px solid #999}}
@@ -212,14 +292,15 @@ universe S&amp;P 500 + NASDAQ 100 · Trend Template passers: {len(tt)} · full s
 {newsection()}{acsec}{mysec}{section('WATCH','WATCH (full setup, ≤5% below pivot)')}{section('HOLD','HOLD')}{section('SELL','SELL')}
 <h2>Cleanest setups (all {len(su)} Trend Template passers, click header to sort)</h2><table id="t"><thead><tr>{thead}</tr></thead><tbody>{rows}</tbody></table>
 <h2>Rules &amp; caveats</h2><div class="cav"><p>Score (0-100): 10/criterion passed (VCP, volume dry-up, pivot, fundamentals) + base length (≤30w) 10 + final contraction tightness 10 + dry-up 10 + pivot proximity 10 + RS 70→99 10 + EPS YoY (cap 100%) 5 + revenue YoY (cap 50%) 5.</p>
-<p>BUY: full setup, close &gt; pivot within last 3 sessions on ≥1.4× 50d volume, ≤5% past pivot; entry = pivot, stop = pivot −8%. WATCH: full setup 0–5% below pivot. HOLD: tracked position above stop and not below 50d SMA on heavy volume, still in Trend Template. SELL: close &lt; stop, or close &lt; 50d SMA on ≥1.4× volume, or fails Trend Template. Partial-profit flag at +20%.</p>
+<p><b>A+ grade (since 2026-11-18, from a 3.7-year backtest):</b> a breakout is only a BUY if all of these hold: (1) market uptrend: SPY and QQQ both above a rising 50-day and rising 200-day, with no more than {MAX_DIST_DAYS} distribution days in the last 25 sessions; (2) leadership: RS rank ≥{APLUS_RS}, or RS ≥{APLUS_RS_LINE} with the RS line (stock ÷ SPY) at a 52-week high; (3) not an earnings-day gap (no earnings report today or yesterday). Breakouts that miss any of these stay on WATCH, labeled with what's missing. A+ sizing: {APLUS_RISK:g}% of equity at risk, max {APLUS_CAP*100:.0f}% of equity per position.</p>
+<p>BUY: A+ grade + full setup, close &gt; pivot within last 3 sessions on ≥1.4× 50d volume, ≤5% past pivot; entry = pivot, stop = pivot −8%. WATCH: full setup 0–5% below pivot. HOLD: tracked position above stop and not below 50d SMA on heavy volume, still in Trend Template. SELL: close &lt; stop, or close &lt; 50d SMA on ≥1.4× volume, or fails Trend Template. Partial-profit flag at +20%.</p>
 <p>VCP detection is algorithmic (3% zigzag swings) and is not a substitute for reviewing charts. EPS acceleration not checked (yfinance gives ~5 quarters). Large EPS % can come from depressed prior-year bases. RS rank is relative to this universe only. Not investment advice.</p>
 <p>{html.escape(' '.join(fail_dl))}</p></div>
 <script>function srt(c){{const tb=document.querySelector('#t tbody');const r=[...tb.rows];const d=tb.dataset.c==c&&tb.dataset.d!='-1'?-1:1;tb.dataset.c=c;tb.dataset.d=d;
 r.sort((a,b)=>{{let x=a.cells[c].innerText,y=b.cells[c].innerText,nx=parseFloat(x),ny=parseFloat(y);return(isNaN(nx)||isNaN(ny)?x.localeCompare(y):nx-ny)*d}});r.forEach(e=>tb.appendChild(e))}}</script></body></html>'''
 open('dashboard.html','w').write(page)
 if not INTRADAY: shutil.copy('dashboard.html',f'archive/dashboard_{asof}.html')
-md=[f'# Minervini summary — data as of {asof}','',(f'Account: cash ${cash:,.2f}, open ${openval:,.2f}, equity ${eq:,.2f}, P&L {eq-start:+,.2f} ({(eq-start)/start*100:+.2f}%)' if AC else 'Account: account.json missing'),'','## My positions']+[f"- {d['t']}: {d['status']} — {d['shares']} sh @ {d['entry']}, now {d['price']}, P/L {d['pl']:+.2f} ({d['plp']:+.2f}%), stop {d['stop']} ({d['to_stop']}% away); {d['why']}" for d in mysum]+['',f'Trend Template passers: {len(tt)} · full setups: {len(full)}','']
+md=[f'# Minervini summary — data as of {asof}','',('MARKET OK for A+ buys: ' if MKT['ok'] else 'MARKET NOT OK, no new buys: ')+MKT['txt'],'',(f'Account: cash ${cash:,.2f}, open ${openval:,.2f}, equity ${eq:,.2f}, P&L {eq-start:+,.2f} ({(eq-start)/start*100:+.2f}%)' if AC else 'Account: account.json missing'),'','## My positions']+[f"- {d['t']}: {d['status']} — {d['shares']} sh @ {d['entry']}, now {d['price']}, P/L {d['pl']:+.2f} ({d['plp']:+.2f}%), stop {d['stop']} ({d['to_stop']}% away); {d['why']}" for d in mysum]+['',f'Trend Template passers: {len(tt)} · full setups: {len(full)}','']
 for k in ('BUY','WATCH','HOLD','SELL'):
     ts=[t for t,s in sig.items() if s==k]; md.append(f'## {k} ({len(ts)})'); md+= [f'- {t}: {notes[t]}'+(f' | {sztxt(t,k)}' if k in ('BUY','WATCH') and sztxt(t,k) else '') for t in ts] or ['- none']; md.append('')
 md+=['## Changes vs previous run']+(changes or ['- none'])+['','Top 10 cleanest: '+', '.join(f'{r.ticker} ({r.score})' for r in su.head(10).itertuples())]
