@@ -4,43 +4,29 @@
    "entry": 385.37,
    "stop": 354.54,
    "since": "2026-10-20",
-   "last": 390.61,
-   "gain_pct": 1.4
-  },
-  "CSX": {
-   "entry": 49.22,
-   "stop": 45.28,
-   "since": "2026-10-22",
-   "last": 49.98,
-   "gain_pct": 1.5
-  },
-  "AMGN": {
-   "entry": 475.65,
-   "stop": 437.6,
-   "since": "2026-11-04",
-   "last": 438.82,
-   "gain_pct": -7.7
+   "last": 393.24,
+   "gain_pct": 2.0
   },
   "AIZ": {
    "entry": 297.76,
    "stop": 273.94,
    "since": "2026-11-04",
-   "last": 316.03,
-   "gain_pct": 6.1
+   "last": 316.65,
+   "gain_pct": 6.3
   },
   "GWW": {
    "entry": 1389.23,
    "stop": 1278.09,
    "since": "2026-11-05",
-   "last": 1423.88,
-   "gain_pct": 2.5
+   "last": 1357.35,
+   "gain_pct": -2.3
   },
   "CAH": {
    "entry": 259.84,
    "stop": 239.05,
    "since": "2026-11-05",
-   "last": 272.34,
-   "gain_pct": 4.8
+   "last": 272.81,
+   "gain_pct": 5.0
   }
  },
  "history": [
@@ -203,19 +189,33 @@
    "price": 385.78,
    "entry": 422.65,
    "reason": "close 385.78 < stop 388.84; closed below 50d SMA on heavy volume; failed Trend Template"
+  },
+  {
+   "date": "2026-11-20",
+   "ticker": "CSX",
+   "signal": "SELL",
+   "price": 49.1,
+   "entry": 49.22,
+   "reason": "failed Trend Template"
+  },
+  {
+   "date": "2026-11-20",
+   "ticker": "AMGN",
+   "signal": "SELL",
+   "price": 435.64,
+   "entry": 475.65,
+   "reason": "close 435.64 < stop 437.6"
   }
  ],
  "last_signals": {
   "TRV": "HOLD",
-  "CSX": "HOLD",
-  "AMGN": "HOLD",
+  "CSX": "SELL",
+  "AMGN": "SELL",
   "AIZ": "HOLD",
   "GWW": "HOLD",
   "CAH": "HOLD",
   "DGX": "WATCH",
-  "DLTR": "WATCH",
-  "MAS": "WATCH",
-  "HLT": "WATCH"
+  "SJM": "WATCH"
  },
  "runs": [
   {
@@ -771,6 +771,20 @@
     "DLTR": "WATCH",
     "MAS": "WATCH",
     "HLT": "WATCH"
+   }
+  },
+  {
+   "run": "2026-11-20T16:37",
+   "asof": "2026-11-20",
+   "signals": {
+    "TRV": "HOLD",
+    "CSX": "SELL",
+    "AMGN": "SELL",
+    "AIZ": "HOLD",
+    "GWW": "HOLD",
+    "CAH": "HOLD",
+    "DGX": "WATCH",
+    "SJM": "WATCH"
    }
   }
  ]
