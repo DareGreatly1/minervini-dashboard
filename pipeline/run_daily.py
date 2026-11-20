@@ -212,7 +212,7 @@ def card(t,kind):
     pv=p.get('entry', r.pivot if r is not None else None); sp=p.get('stop', round(pv*(1-STOP_PCT),2) if pv else None)
     nm=html.escape(str(names.get(t,''))) if t in names else ''
     sc=f" · score {r.score}" if r is not None else ''
-    return f'<div class="card {kind}"><b>{t}</b> {nm}{sc}<br>{gbadge(t)}<small>{html.escape(notes.get(t,""))}</small><br><b style="font-size:12px">{html.escape(sztxt(t,kind)) if kind in ('BUY','WATCH') else ''}</b><br>{svg(t,pv,sp)}</div>'
+    return f'<div class="card {kind}"><b>{t}</b> {nm}{sc}<br>{gbadge(t)}<small>{html.escape(notes.get(t,""))}</small><br><b style="font-size:12px">{html.escape(sztxt(t,kind)) if kind in ("BUY","WATCH") else ""}</b><br>{svg(t,pv,sp)}</div>'
 
 # ---- BUY (new): tracked positions whose BUY came on the last completed session before today (or today)
 def _newset():
