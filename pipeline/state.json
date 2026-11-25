@@ -4,29 +4,29 @@
    "entry": 385.37,
    "stop": 354.54,
    "since": "2026-10-20",
-   "last": 400.87,
-   "gain_pct": 4.0
+   "last": 406.86,
+   "gain_pct": 5.6
   },
   "AIZ": {
    "entry": 297.76,
    "stop": 273.94,
    "since": "2026-11-04",
-   "last": 322.64,
-   "gain_pct": 8.4
+   "last": 325.73,
+   "gain_pct": 9.4
   },
   "GWW": {
    "entry": 1389.23,
    "stop": 1278.09,
    "since": "2026-11-05",
-   "last": 1398.02,
-   "gain_pct": 0.6
+   "last": 1415.9,
+   "gain_pct": 1.9
   },
   "CAH": {
    "entry": 259.84,
    "stop": 239.05,
    "since": "2026-11-05",
-   "last": 279.65,
-   "gain_pct": 7.6
+   "last": 282.91,
+   "gain_pct": 8.9
   }
  },
  "history": [
@@ -212,12 +212,9 @@
   "AIZ": "HOLD",
   "GWW": "HOLD",
   "CAH": "HOLD",
-  "BBY": "WATCH",
   "ROP": "WATCH",
-  "ABBV": "WATCH",
-  "CPAY": "WATCH",
-  "AAPL": "WATCH",
-  "CSX": "WATCH"
+  "CBOE": "WATCH",
+  "CPAY": "WATCH"
  },
  "runs": [
   {
@@ -818,6 +815,19 @@
     "CPAY": "WATCH",
     "AAPL": "WATCH",
     "CSX": "WATCH"
+   }
+  },
+  {
+   "run": "2026-11-25T14:38",
+   "asof": "2026-11-25",
+   "signals": {
+    "TRV": "HOLD",
+    "AIZ": "HOLD",
+    "GWW": "HOLD",
+    "CAH": "HOLD",
+    "ROP": "WATCH",
+    "CBOE": "WATCH",
+    "CPAY": "WATCH"
    }
   }
  ]
