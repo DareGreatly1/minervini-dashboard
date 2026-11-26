@@ -829,6 +829,19 @@
     "CBOE": "WATCH",
     "CPAY": "WATCH"
    }
+  },
+  {
+   "run": "2026-11-26T14:42",
+   "asof": "2026-11-25",
+   "signals": {
+    "TRV": "HOLD",
+    "AIZ": "HOLD",
+    "GWW": "HOLD",
+    "CAH": "HOLD",
+    "ROP": "WATCH",
+    "CBOE": "WATCH",
+    "CPAY": "WATCH"
+   }
   }
  ]
 }
